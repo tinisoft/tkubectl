@@ -1,0 +1,8 @@
+kube-configs:
+  - name: "my-cluster-1"
+    path: "/path/to/your/kubeconfig.yaml"
+  - name: "my-cluster-2"
+    path: "/path/to/another/kubeconfig.yaml"
+
+# Optional: default cluster to load at startup
+default-cluster: "my-cluster-1"

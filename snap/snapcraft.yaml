@@ -1,0 +1,39 @@
+name: tkubectl
+version: "1.0"
+summary: An example Flutter snap
+description: |
+  An example showing how Flutter programs can be packaged as snaps.
+
+base: core22
+confinement: strict
+grade: stable
+
+slots:
+  dbus-tkubectl:
+    interface: dbus
+    bus: session
+    name: com.example.tkubectl
+
+apps:
+  tkubectl:
+    command: tkubectl
+    extensions: [gnome]
+    plugs:
+      - network
+    slots:
+      - dbus-tkubectl
+
+parts:
+  tkubectl-bin:
+    source: build/linux/x64/release/bundle
+    source-type: local
+    plugin: dump
+    organize:
+      launch.wrapper: tkubectl
+  # Integrate custom dialogs in your snap - doc - snapcraft.io
+  # https://forum.snapcraft.io/t/integrate-custom-dialogs-in-your-snap/10825
+  zenity-integration:
+    plugin: nil 
+    stage-snaps:
+      - zenity-integration
+
