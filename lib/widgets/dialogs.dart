@@ -97,7 +97,9 @@ class _CreateNamespaceDialogState extends State<CreateNamespaceDialog> {
 }
 
 class CreateDockerRegistrySecretDialog extends StatefulWidget {
-  const CreateDockerRegistrySecretDialog({super.key});
+  final String? namespace;
+
+  const CreateDockerRegistrySecretDialog({super.key, this.namespace});
 
   @override
   State<CreateDockerRegistrySecretDialog> createState() => _CreateDockerRegistrySecretDialogState();
@@ -150,6 +152,30 @@ class _CreateDockerRegistrySecretDialogState extends State<CreateDockerRegistryS
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (widget.namespace != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.consoleGray.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: AppTheme.consoleYellow.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, size: 16, color: AppTheme.consoleYellow),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Namespace: ${widget.namespace}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.consoleWhite,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(

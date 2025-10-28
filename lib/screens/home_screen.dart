@@ -267,6 +267,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result != null && mounted) {
       if (result['action'] == 'select') {
         await appProvider.setKubeConfig(result['config']);
+        // Reset UI to show only namespace list
+        setState(() {
+          _selectedPod = null;
+          _podLogs = null;
+          _isLoadingLogs = false;
+          _logCheckpoints.clear();
+          _selectedCheckpointIndex = -1;
+        });
       } else if (result['action'] == 'add') {
         final newConfig = KubeConfig(
           name: result['name'],
@@ -274,6 +282,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         await appProvider.addKubeConfig(newConfig);
         await appProvider.setKubeConfig(newConfig);
+        // Reset UI to show only namespace list
+        setState(() {
+          _selectedPod = null;
+          _podLogs = null;
+          _isLoadingLogs = false;
+          _logCheckpoints.clear();
+          _selectedCheckpointIndex = -1;
+        });
       } else if (result['action'] == 'delete') {
         final config = result['config'] as KubeConfig;
         final confirmed = await _showDeleteConfigConfirmation(config);
@@ -441,9 +457,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showCreateSecretDialog() async {
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
     final result = await showDialog<Map<String, String>>(
       context: context,
-      builder: (context) => const CreateDockerRegistrySecretDialog(),
+      builder: (context) => CreateDockerRegistrySecretDialog(
+        namespace: appProvider.currentNamespace,
+      ),
     );
 
     if (result != null && mounted) {
