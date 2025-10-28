@@ -23,17 +23,40 @@ class KubectlService {
     try {
       final command = ['kubectl'];
 
-      // Add kubeconfig if set
-      if (_currentKubeConfig != null) {
-        command.addAll(['--kubeconfig', _currentKubeConfig!]);
-      }
+      // Check if this is a plugin command (command doesn't start with standard kubectl verbs)
+      final standardVerbs = ['get', 'describe', 'create', 'delete', 'apply', 'edit', 'patch', 'replace', 'logs', 'exec', 'port-forward', 'proxy', 'cp', 'auth', 'scale', 'autoscale', 'rollout', 'label', 'annotate', 'config', 'cluster-info', 'top', 'cordon', 'uncordon', 'drain', 'taint', 'version', 'api-resources', 'api-versions', 'explain'];
+      final isPlugin = args.isNotEmpty && !standardVerbs.contains(args.first);
 
-      // Add namespace if set and not already in args
-      if (_currentNamespace != null && !args.contains('-n') && !args.contains('--namespace')) {
-        command.addAll(['-n', _currentNamespace!]);
-      }
+      if (isPlugin) {
+        // For plugins, add the plugin name first, then flags
+        command.add(args.first);
 
-      command.addAll(args);
+        // Add kubeconfig if set
+        if (_currentKubeConfig != null) {
+          command.addAll(['--kubeconfig', _currentKubeConfig!]);
+        }
+
+        // Add namespace if set and not already in args
+        if (_currentNamespace != null && !args.contains('-n') && !args.contains('--namespace')) {
+          command.addAll(['-n', _currentNamespace!]);
+        }
+
+        // Add remaining args
+        command.addAll(args.skip(1));
+      } else {
+        // For standard commands, add flags before the command
+        // Add kubeconfig if set
+        if (_currentKubeConfig != null) {
+          command.addAll(['--kubeconfig', _currentKubeConfig!]);
+        }
+
+        // Add namespace if set and not already in args
+        if (_currentNamespace != null && !args.contains('-n') && !args.contains('--namespace')) {
+          command.addAll(['-n', _currentNamespace!]);
+        }
+
+        command.addAll(args);
+      }
 
       final result = await Process.run(
         command.first,
